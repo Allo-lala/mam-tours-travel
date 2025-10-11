@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  passwordHash  String
+  name          String?
+  role          Role           @default(USER)
+  bookings      Booking[]
+  refreshTokens RefreshToken[]
+  createdAt     DateTime       @default(now())
+}
+
+model Vehicle {
+  id        Int           @id @default(autoincrement())
+  brand     String
+  model     String?
+  plate     String        @unique
+  dailyRate Float
+  seats     Int
+  status    VehicleStatus @default(AVAILABLE)
+  bookings  Booking[]
+  createdAt DateTime      @default(now())
+}
+
+model Booking {
+  id         Int           @id @default(autoincrement())
+  user       User          @relation(fields: [userId], references: [id])
+  userId     Int
+  vehicle    Vehicle       @relation(fields: [vehicleId], references: [id])
+  vehicleId  Int
+  startAt    DateTime
+  endAt      DateTime
+  hiredAt    DateTime?
+  returnedAt DateTime?
+  purpose    Purpose
+  type       HireType
+  status     BookingStatus @default(CONFIRMED)
+  totalCost  Float?
+  createdAt  DateTime      @default(now())
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  HIRED
+  MAINTENANCE
+}
+
+enum Purpose {
+  SELF_DRIVE
+  VIP
+  ESCORT
+  FUNCTION
+  AIRPORT_TRANSFER
+  OTHER
+}
+
+enum HireType {
+  HOURLY
+  DAILY
+  WEEKLY
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
