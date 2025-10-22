@@ -2,6 +2,7 @@ import { Router } from "express"
 import { PrismaClient } from "@prisma/client"
 import { authenticate, requireAdmin } from "../middleware/auth"
 import { bookingSchema } from "../utils/validation"
+import { z } from "zod"
 
 const router = Router()
 const prisma = new PrismaClient()

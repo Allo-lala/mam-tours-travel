@@ -16,7 +16,7 @@ interface Vehicle {
   brand: string
   model: string | null
   plate: string
-  dailyRate: number
+  dailyRate: number | null
   seats: number
   status: string
 }
@@ -133,7 +133,7 @@ export default function VehiclesPage() {
                   </div>
                   <div className="pt-2 border-t">
                     <p className="text-2xl font-bold text-primary">
-                      UGX {vehicle.dailyRate.toLocaleString()}
+                      UGX {vehicle.dailyRate ? Number(vehicle.dailyRate).toLocaleString() : "N/A"}
                       <span className="text-sm font-normal text-muted-foreground">/day</span>
                     </p>
                   </div>

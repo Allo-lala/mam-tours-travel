@@ -1,6 +1,6 @@
 # MAM Tours & Travel - Car Hire Management System
 
-A complete car hire management system for Uganda with REST API, PostgreSQL database, and Next.js frontend.
+A complete car hire management system  with REST API, PostgreSQL database, and Next.js frontend.
 
 ## Features
 
@@ -31,12 +31,8 @@ A complete car hire management system for Uganda with REST API, PostgreSQL datab
 
 ## Quick Start with Docker
 
-1. **Clone and setup:**
-\`\`\`bash
-git clone <repository>
-cd mam-tours-travel
-\`\`\`
-
+1. **setup:**
+\
 2. **Start all services:**
 \`\`\`bash
 docker-compose up
