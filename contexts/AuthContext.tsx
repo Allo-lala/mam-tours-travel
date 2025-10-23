@@ -16,6 +16,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
   isLoading: boolean
+  isMounted: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -25,15 +26,25 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
+    setIsMounted(true)
+
     // Check for stored user on mount
     const storedUser = localStorage.getItem("user")
     const accessToken = localStorage.getItem("accessToken")
 
     if (storedUser && accessToken) {
-      setUser(JSON.parse(storedUser))
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch (error) {
+        // Clear invalid stored data
+        localStorage.removeItem("user")
+        localStorage.removeItem("accessToken")
+        localStorage.removeItem("refreshToken")
+      }
     }
     setIsLoading(false)
   }, [])
@@ -95,7 +106,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/login")
   }
 
-  return <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, login, register, logout, isLoading, isMounted }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => {

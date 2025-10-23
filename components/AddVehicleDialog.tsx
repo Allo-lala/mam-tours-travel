@@ -56,7 +56,7 @@ export default function AddVehicleDialog({ onSuccess }: AddVehicleDialogProps) {
 
       toast({
         title: "Vehicle added",
-        description: "The vehicle has been successfully added to the fleet.",
+        description: "The vehicle has been successfully added to Mam Tours and Travel.",
       })
 
       setFormData({ brand: "", model: "", plate: "", dailyRate: "", seats: "" })

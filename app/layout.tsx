@@ -4,13 +4,13 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { Toaster } from "@/components/ui/toaster"
+import { Navigation } from "@/components/Navigation"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
   title: "MAM Tours & Travel - Car Hire Uganda",
   description: "Premium car hire services in Uganda",
-    generator: 'v0.app'
 }
 
 export default function RootLayout({
@@ -19,9 +19,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="font-sans antialiased">
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <AuthProvider>
+          <Navigation />
           {children}
           <Toaster />
         </AuthProvider>

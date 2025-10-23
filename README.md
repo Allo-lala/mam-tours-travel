@@ -189,25 +189,3 @@ The system validates two formats:
 1. **Legacy Format**: `UAA 001A` (3 letters + 3 digits + 1 letter)
 2. **Digital Format**: `UG 32 00042` (UG + 1-2 digits + 4-5 digits)
 
-## Database Schema
-
-- **User**: Authentication and user management
-- **Vehicle**: Vehicle fleet with status tracking
-- **Booking**: Booking records with hire/return timestamps
-- **RefreshToken**: Secure token storage for auth
-
-See `backend/prisma/schema.prisma` for complete schema.
-
-## Seed Data
-
-The system includes 6 sample vehicles:
-- Mercedes-Benz E350 (UBA 123C)
-- Audi A6 (UAA 045D)
-- BMW X5 (UAB 678E)
-- Toyota Prado (UAC 999F)
-- Mercedes-Benz S500 (UBB 001G)
-- Audi Q7 (UG 32 00042)
-
-## License
-
-MIT

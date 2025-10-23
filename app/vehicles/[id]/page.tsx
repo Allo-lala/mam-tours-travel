@@ -72,6 +72,36 @@ export default function VehicleDetailPage() {
       return
     }
 
+    if (!startAt || !endAt) {
+      toast({
+        title: "Invalid dates",
+        description: "Please select both start and end dates",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const startDate = new Date(startAt)
+    const endDate = new Date(endAt)
+
+    if (startDate >= endDate) {
+      toast({
+        title: "Invalid dates",
+        description: "End date must be after start date",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (startDate < new Date()) {
+      toast({
+        title: "Invalid dates",
+        description: "Start date must be in the future",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsBooking(true)
 
     try {
@@ -79,8 +109,8 @@ export default function VehicleDetailPage() {
         method: "POST",
         body: JSON.stringify({
           vehicleId: vehicle!.id,
-          startAt,
-          endAt,
+          startAt: startDate.toISOString(),
+          endAt: endDate.toISOString(),
           purpose,
           type,
         }),
@@ -88,7 +118,7 @@ export default function VehicleDetailPage() {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error)
+        throw new Error(error.error || "Failed to create booking")
       }
 
       toast({

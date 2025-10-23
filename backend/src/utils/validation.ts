@@ -37,8 +37,12 @@ export const vehicleSchema = z.object({
 
 export const bookingSchema = z.object({
   vehicleId: z.number().int().positive(),
-  startAt: z.string().datetime(),
-  endAt: z.string().datetime(),
+  startAt: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format",
+  }),
+  endAt: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format",
+  }),
   purpose: z.enum(["SELF_DRIVE", "VIP", "ESCORT", "FUNCTION", "AIRPORT_TRANSFER", "OTHER"]),
   type: z.enum(["HOURLY", "DAILY", "WEEKLY"]),
 })
