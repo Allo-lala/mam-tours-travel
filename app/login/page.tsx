@@ -25,7 +25,7 @@ export default function LoginPage() {
     try {
       await login(email, password)
       toast({
-        title: "Welcome back!",
+        title: "Welcome to Mam Tours!",
         description: "You have successfully logged in.",
       })
     } catch (error: any) {
@@ -80,7 +80,7 @@ export default function LoginPage() {
             </Link>
           </div>
           <div className="mt-4 p-3 bg-muted rounded-md text-sm">
-            <p className="font-semibold mb-1">Demo Credentials:</p>
+            <p className="font-semibold mb-1">Demo Credentials</p>
             <p>Admin: admin@mamtours.ug / admin123</p>
             <p>User: user@example.com / user123</p>
           </div>
