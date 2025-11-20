@@ -35,7 +35,7 @@ export default function HomePage() {
             <div className="relative h-[400px] w-full hidden md:block">
               <div className="absolute inset-0 bg-gradient-to-r from-slate-900/50 to-transparent z-10 rounded-2xl" />
               <Image
-                src="/luxury-black-mercedes-suv-side-view.jpg"
+                src="/layouttt.png"
                 alt="Premium Luxury Vehicle"
                 fill
                 className="object-cover rounded-2xl shadow-2xl border border-white/10"
