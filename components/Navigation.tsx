@@ -11,8 +11,8 @@ export function Navigation() {
   const pathname = usePathname()
   const { user, logout, isMounted } = useAuth()
 
-  console.log("[v0] Navigation - User:", user)
-  console.log("[v0] Navigation - User Role:", user?.role)
+  console.log("[ Navigation - User:", user)
+  console.log("[ Navigation - User Role:", user?.role)
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -20,9 +20,9 @@ export function Navigation() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <div className="relative h-10 w-10">
-              <Image src="/placeholder-logo.svg" alt="MAM Tours Logo" fill className="object-contain" />
+              <Image src="/logoo.png" alt="MAM Tours Logo" fill className="object-contain" />
             </div>
-            <span className="font-bold text-xl">MAM Tours & Travel</span>
+            <span className="font-bold text-xl">Tours & Travel</span>
           </Link>
 
           <div className="flex items-center gap-6">

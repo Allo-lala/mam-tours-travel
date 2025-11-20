@@ -9,7 +9,7 @@ import { Navigation } from "@/components/Navigation"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
-  title: "MAM Tours & Travel - Car Hire Uganda",
+  title: "MAM Tours & Travel",
   description: "Premium car hire services in Uganda",
 }
 

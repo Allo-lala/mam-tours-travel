@@ -7,11 +7,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { fetchWithAuth } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 import { toZonedTime } from "date-fns-tz"
 import AddVehicleDialog from "@/components/AddVehicleDialog"
+import { Trash2, Car, Users } from "lucide-react"
 
 const TIMEZONE = "Africa/Kampala"
 
@@ -34,11 +46,22 @@ interface Booking {
   }
 }
 
+interface Vehicle {
+  id: number
+  brand: string
+  model: string | null
+  plate: string
+  dailyRate: number | null
+  seats: number
+  status: string
+}
+
 export default function AdminPage() {
   const { user } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -51,6 +74,7 @@ export default function AdminPage() {
       return
     }
     fetchBookings()
+    fetchVehicles()
   }, [user])
 
   const fetchBookings = async () => {
@@ -62,6 +86,16 @@ export default function AdminPage() {
       console.error("Failed to fetch bookings:", error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchVehicles = async () => {
+    try {
+      const response = await fetchWithAuth("/api/vehicles")
+      const data = await response.json()
+      setVehicles(data)
+    } catch (error) {
+      console.error("Failed to fetch vehicles:", error)
     }
   }
 
@@ -117,6 +151,32 @@ export default function AdminPage() {
     }
   }
 
+  const handleDeleteVehicle = async (vehicleId: number) => {
+    try {
+      const response = await fetchWithAuth(`/api/vehicles/${vehicleId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Failed to delete vehicle")
+      }
+
+      toast({
+        title: "Vehicle deleted",
+        description: "The vehicle has been successfully removed.",
+      })
+
+      fetchVehicles()
+    } catch (error: any) {
+      toast({
+        title: "Delete failed",
+        description: error.message,
+        variant: "destructive",
+      })
+    }
+  }
+
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString)
     const zonedDate = toZonedTime(date, TIMEZONE)
@@ -142,13 +202,14 @@ export default function AdminPage() {
             <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
             <p className="text-muted-foreground">Manage bookings and vehicles</p>
           </div>
-          <AddVehicleDialog onSuccess={fetchBookings} />
+          <AddVehicleDialog onSuccess={fetchVehicles} />
         </div>
 
         <Tabs defaultValue="active" className="space-y-6">
           <TabsList>
             <TabsTrigger value="active">Active Bookings ({confirmedBookings.length})</TabsTrigger>
             <TabsTrigger value="completed">Completed ({completedBookings.length})</TabsTrigger>
+            <TabsTrigger value="vehicles">Vehicles ({vehicles.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="active" className="space-y-4">
@@ -250,6 +311,69 @@ export default function AdminPage() {
                 </Card>
               ))
             )}
+          </TabsContent>
+
+          <TabsContent value="vehicles" className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {vehicles.map((vehicle) => (
+                <Card key={vehicle.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle>
+                          {vehicle.brand} {vehicle.model}
+                        </CardTitle>
+                        <Badge variant={vehicle.status === "AVAILABLE" ? "default" : "secondary"}>
+                          {vehicle.status}
+                        </Badge>
+                      </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/90">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Vehicle</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this vehicle? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteVehicle(vehicle.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Car className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-mono">{vehicle.plate}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="w-4 h-4 text-muted-foreground" />
+                        <span>{vehicle.seats} seats</span>
+                      </div>
+                      <div className="pt-2 border-t">
+                        <p className="text-xl font-bold text-primary">
+                          UGX {vehicle.dailyRate ? Number(vehicle.dailyRate).toLocaleString() : "N/A"}
+                          <span className="text-sm font-normal text-muted-foreground">/day</span>
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
