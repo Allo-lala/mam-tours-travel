@@ -10,7 +10,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
   title: "MAM Tours & Travel",
-  description: "Premium car hire services in Uganda",
+   icons: {
+    icon: "/logoo.png", 
+  
+  },
 }
 
 export default function RootLayout({

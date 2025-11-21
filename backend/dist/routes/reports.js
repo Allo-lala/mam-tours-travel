@@ -1,0 +1,55 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const client_1 = require("@prisma/client");
+const auth_1 = require("../middleware/auth");
+const router = (0, express_1.Router)();
+const prisma = new client_1.PrismaClient();
+// Vehicle usage report (admin only)
+router.get("/usage", auth_1.authenticate, auth_1.requireAdmin, async (req, res, next) => {
+    try {
+        const vehicles = await prisma.vehicle.findMany({
+            include: {
+                bookings: {
+                    where: {
+                        status: { in: ["CONFIRMED", "COMPLETED"] },
+                    },
+                    orderBy: { startAt: "desc" },
+                },
+            },
+        });
+        const report = vehicles.map((vehicle) => {
+            const completedBookings = vehicle.bookings.filter((b) => b.status === "COMPLETED");
+            const totalRevenue = completedBookings.reduce((sum, b) => sum + (b.totalCost || 0), 0);
+            return {
+                vehicle: {
+                    id: vehicle.id,
+                    brand: vehicle.brand,
+                    model: vehicle.model,
+                    plate: vehicle.plate,
+                    status: vehicle.status,
+                },
+                stats: {
+                    totalBookings: vehicle.bookings.length,
+                    completedBookings: completedBookings.length,
+                    activeBookings: vehicle.bookings.filter((b) => b.status === "CONFIRMED").length,
+                    totalRevenue,
+                },
+                recentBookings: vehicle.bookings.slice(0, 5).map((b) => ({
+                    id: b.id,
+                    startAt: b.startAt,
+                    endAt: b.endAt,
+                    hiredAt: b.hiredAt,
+                    returnedAt: b.returnedAt,
+                    status: b.status,
+                    totalCost: b.totalCost,
+                })),
+            };
+        });
+        res.json(report);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.default = router;

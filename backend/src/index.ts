@@ -32,8 +32,10 @@ app.get("/health", (req, res) => {
 // Error handler
 app.use(errorHandler)
 
-app.listen(PORT, () => {
-  console.log(`🚗 MAM Tours & Travel API running on port ${PORT}`)
-})
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`🚗 MAM Tours & Travel API running on port ${PORT}`)
+  })
+}
 
 export default app
