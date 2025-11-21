@@ -1,11 +1,9 @@
 import { Router } from "express"
-import { PrismaClient } from "@prisma/client"
+import prisma from "../lib/prisma"
 import { authenticate, requireAdmin } from "../middleware/auth"
 import { bookingSchema } from "../utils/validation"
-import { z } from "zod"
 
 const router = Router()
-const prisma = new PrismaClient()
 
 // Check vehicle availability for date range
 const checkAvailability = async (vehicleId: number, startAt: Date, endAt: Date, excludeBookingId?: number) => {

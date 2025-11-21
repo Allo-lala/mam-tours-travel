@@ -1,10 +1,9 @@
 import { Router } from "express"
-import { PrismaClient } from "@prisma/client"
+import prisma from "../lib/prisma"
 import { authenticate, requireAdmin } from "../middleware/auth"
 import { vehicleSchema, normalizePlate } from "../utils/validation"
 
 const router = Router()
-const prisma = new PrismaClient()
 
 // Get all vehicles (public)
 router.get("/", async (req, res, next) => {

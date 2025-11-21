@@ -1,20 +1,21 @@
 import { Router } from "express"
-import { PrismaClient } from "@prisma/client"
+import prisma from "../lib/prisma"
 import bcrypt from "bcrypt"
 import { registerSchema, loginSchema } from "../utils/validation"
 import { generateAccessToken, generateRefreshToken, hashToken, verifyRefreshToken } from "../utils/jwt"
 
 const router = Router()
-const prisma = new PrismaClient()
 
 // Register
 router.post("/register", async (req, res, next) => {
   try {
+    console.log("[Auth] Register request received:", req.body.email)
     const data = registerSchema.parse(req.body)
 
     // Check if user exists
     const existing = await prisma.user.findUnique({ where: { email: data.email } })
     if (existing) {
+      console.log("[Auth] Email already registered:", data.email)
       return res.status(409).json({ error: "Email already registered" })
     }
 
@@ -36,6 +37,7 @@ router.post("/register", async (req, res, next) => {
         createdAt: true,
       },
     })
+    console.log("[Auth] User created:", user.id)
 
     // Generate tokens
     const accessToken = generateAccessToken({ id: user.id, email: user.email, role: user.role })
@@ -53,6 +55,7 @@ router.post("/register", async (req, res, next) => {
 
     res.status(201).json({ user, accessToken, refreshToken })
   } catch (error) {
+    console.error("[Auth] Register error:", error)
     next(error)
   }
 })
@@ -60,25 +63,32 @@ router.post("/register", async (req, res, next) => {
 // Login
 router.post("/login", async (req, res, next) => {
   try {
+    console.log("[Auth] Login request received:", req.body.email)
     const data = loginSchema.parse(req.body)
 
     // Find user
+    console.log("[Auth] Finding user...")
     const user = await prisma.user.findUnique({ where: { email: data.email } })
     if (!user) {
+      console.log("[Auth] User not found")
       return res.status(401).json({ error: "Invalid credentials" })
     }
 
     // Verify password
+    console.log("[Auth] Verifying password...")
     const valid = await bcrypt.compare(data.password, user.passwordHash)
     if (!valid) {
+      console.log("[Auth] Invalid password")
       return res.status(401).json({ error: "Invalid credentials" })
     }
 
     // Generate tokens
+    console.log("[Auth] Generating tokens...")
     const accessToken = generateAccessToken({ id: user.id, email: user.email, role: user.role })
     const refreshToken = generateRefreshToken({ id: user.id, email: user.email, role: user.role })
 
     // Store refresh token
+    console.log("[Auth] Storing refresh token...")
     const tokenHash = await hashToken(refreshToken)
     await prisma.refreshToken.create({
       data: {
@@ -88,6 +98,7 @@ router.post("/login", async (req, res, next) => {
       },
     })
 
+    console.log("[Auth] Login successful")
     res.json({
       user: {
         id: user.id,
@@ -99,6 +110,7 @@ router.post("/login", async (req, res, next) => {
       refreshToken,
     })
   } catch (error) {
+    console.error("[Auth] Login error:", error)
     next(error)
   }
 })
