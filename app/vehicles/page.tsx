@@ -40,9 +40,16 @@ export default function VehiclesPage() {
     try {
       const response = await fetch(`${API_URL}/api/vehicles`)
       const data = await response.json()
-      setVehicles(data)
+
+      if (Array.isArray(data)) {
+        setVehicles(data)
+      } else {
+        console.error("Expected array of vehicles but got:", data)
+        setVehicles([])
+      }
     } catch (error) {
       console.error("Failed to fetch vehicles:", error)
+      setVehicles([])
     } finally {
       setIsLoading(false)
     }
