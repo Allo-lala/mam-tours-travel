@@ -19,7 +19,7 @@ export function Navigation() {
 
   const NavItems = ({ mobile = false }: { mobile?: boolean }) => (
     <>
-      <Link
+      {/* <Link
         href="/vehicles"
         onClick={() => mobile && setIsOpen(false)}
         className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary ${
@@ -28,7 +28,7 @@ export function Navigation() {
       >
         <Car className="h-4 w-4" />
         Vehicles
-      </Link>
+      </Link> */}
 
       {isMounted && (
         <>
